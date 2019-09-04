@@ -12,30 +12,26 @@ class TodoListVC: UITableViewController {
 
     //MARK: - 1. Create item array
     var itemArray = [Item]()
-        
-    //MARK: - 4.1 Set-up user defaults and keys for user defaults
-    let defaults = UserDefaults.standard
+    
+    
+    //4.1 Set-up user defaults and keys for user defaults
+//    let defaults = UserDefaults.standard
+    //MARK: - 4.1 Replace UserDefaults with Encoder... first find out the file path of the p-list where 'User Items' are being stored. i.e. we create our own plist at the location of the datapath
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
+ //   let defaults = UserDefaults.standard
     let itemKey = "TodoListArray"
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        itemArray.append(newItem)
+        //Load defaults when view opens up.
+//        if let items = defaults.array(forKey: itemKey) as? [Item] {
+//            itemArray = items
+//        }
         
-        let newItem2 = Item()
-        newItem2.title = "But Eggs"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "Save the world"
-        itemArray.append(newItem3)
-        
-        //MARK: - 4.3 Load defaults when view opens up.
-        if let items = defaults.array(forKey: itemKey) as? [Item] {
-            itemArray = items
-        }
+        //MARK: - 4.3 Decoderd to load 'defalut' data from items.plist when screen is viewed
+        loadItems()
         
     }
     
@@ -54,6 +50,7 @@ class TodoListVC: UITableViewController {
         
         //give cell a checkmark
         cell.accessoryType = item.done ? .checkmark : .none
+        
 //        the above (ternary operator) is same as the below
 //        if item.done == true {
 //            cell.accessoryType = .checkmark
@@ -70,8 +67,7 @@ class TodoListVC: UITableViewController {
         print(itemArray[indexPath.row])
         
         itemArray[indexPath.row].done.toggle()
-        
-        tableView.reloadData()
+        saveItems()
         
         //dont keep cell row coloured grey - turn it back into white after it's selected
         tableView.deselectRow(at: indexPath, animated: true)
@@ -92,11 +88,10 @@ class TodoListVC: UITableViewController {
             newItem.title = textField.text!
             self.itemArray.append(newItem)
             
-            //MARK: - 4.2 Set user default
-            self.defaults.set(self.itemArray, forKey: self.itemKey)
-            
-            //reload tableview to show item
-            self.tableView.reloadData()
+            //4.2 Set user default
+//            self.defaults.set(self.itemArray, forKey: self.itemKey)
+            //MARK: - 4.2 Save using Encoder - new object of type PropertyListEncoder to encode data (itemArray) into PropertyList
+            self.saveItems()
 
         }
         
@@ -111,6 +106,36 @@ class TodoListVC: UITableViewController {
         
     }
     
+    //MARK 4.2 - Save data using the encoder
+    func saveItems() {
+        
+        //MARK: - 4.2 Encoder - new object of type PropertyListEncoder to encode data (itemArray) into PropertyList
+        let encoder = PropertyListEncoder()
+        
+        //Need to do a do...catch block to catch errors and write the data into the datafilepath we captured earlier... Make sure we go to ItemClass and mark it as Encodable to we can encode it!
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+            
+        } catch {
+            print("Error encoding item array... \(error)")
+        }
+        
+        //reload tableview to show item
+        self.tableView.reloadData()
+    }
+    
+    //MARK 4.3 - Load data.., make sure to go to ItemCalss and mark it as Decodable
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("something went wrong... \(error)")
+            }
+        }
+    }
 
 }
 

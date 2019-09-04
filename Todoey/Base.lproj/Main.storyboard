@@ -31,7 +31,14 @@
                             <outlet property="delegate" destination="AzN-GR-Ug6" id="PS4-96-Uan"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Todoey" id="FfB-SY-hdZ"/>
+                    <navigationItem key="navigationItem" title="Todoey" id="FfB-SY-hdZ">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="MSa-aG-DzO">
+                            <color key="tintColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            <connections>
+                                <action selector="addBTPressed:" destination="AzN-GR-Ug6" id="cRP-Ll-CNh"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vKl-qS-KD5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

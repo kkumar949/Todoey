@@ -10,12 +10,19 @@ import UIKit
 
 class TodoListVC: UITableViewController {
 
-    //1. Create item array
+    //MARK: - 1. Create item array
     var itemArray = ["Find Mike", "Buy Eggs", "Destroy Demogorgon"]
+    
+    //MARK: - 4.1 Set-up user defaults
+    let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
+        //MARK: - 4.3 Load defaults when view opens up.
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        }
     }
     
     //MARK: - 2.1 Tableview Data Source Methods
@@ -59,6 +66,9 @@ class TodoListVC: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             //what will happen when user click add item BT on UI Alert
             self.itemArray.append(textField.text!)
+            
+            //MARK: - 4.2 Set user default
+            self.defaults.set(self.itemArray, forKey: "TodoListArray")
             
             //reload tableview to show item
             self.tableView.reloadData()
